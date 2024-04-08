@@ -29,7 +29,7 @@ class KMeans {
     // Convert Set to an array to use indexOf
     const genreArray = Array.from(genreSet);
 
-    const oneHotEncoding: any = Array.from(genreSet).fill(0);
+    const oneHotEncoding: any = Array.from(genreSet).fill('0');
 
     for (let i = 0; i < genres.length; i++) {
       const genreIndex = genreArray.indexOf(genres[i]); // Use indexOf on the array
