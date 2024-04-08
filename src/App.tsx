@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import UserForm from "./UserForm";
+import UserForm from "@/components/UserForm";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
-import MusicsDrawer from "./MusicsDrawer";
+import MusicsDrawer from "@/components/MusicsDrawer";
 import { Musics } from "./types";
 import {
   Drawer

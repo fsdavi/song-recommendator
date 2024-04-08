@@ -1,13 +1,11 @@
-// Interface for song data
 interface Song {
   title: string;
   artists: string[];
   genres: string[];
-  points: number; // Assuming points represent some metric (e.g., popularity)
-}
+  points: number;
 
 class KMeans {
-  private k: number; // Number of clusters
+  private k: number;
   private maxIterations: number;
   private data: Song[];
 
@@ -17,7 +15,6 @@ class KMeans {
     this.data = data;
   }
 
-  // Encode genres as one-hot vectors for distance calculation
   private encodeGenres(genres: string[]): number[] {
     const genreSet = new Set<string>();
     for (const song of this.data) {
@@ -26,13 +23,12 @@ class KMeans {
       }
     }
 
-    // Convert Set to an array to use indexOf
     const genreArray = Array.from(genreSet);
 
     const oneHotEncoding: any = Array.from(genreSet).fill('0');
 
     for (let i = 0; i < genres.length; i++) {
-      const genreIndex = genreArray.indexOf(genres[i]); // Use indexOf on the array
+      const genreIndex = genreArray.indexOf(genres[i]);
       if (genreIndex !== -1) {
         oneHotEncoding[genreIndex] = 1;
       } else {
@@ -43,7 +39,6 @@ class KMeans {
     return oneHotEncoding;
   }
 
-  // Calculate distance between two songs (using one-hot encoded genres)
   private distance(song1: Song, song2: Song): number {
     const encodedGenre1 = this.encodeGenres(song1.genres);
     const encodedGenre2 = this.encodeGenres(song2.genres);
@@ -79,19 +74,17 @@ class KMeans {
     return clusters;
   }
 
-  // Update centroids based on assigned songs
   private updateCentroids(clusters: number[][]): Song[] {
     const newCentroids: Song[] = [];
     for (const cluster of clusters) {
       const newCentroid: Song = {
-        title: "", // Can potentially be set to an average title
-        artists: [], // Can potentially be set to a combined artist list
+        title: "",
+        artists: [],
         genres: [],
-        points: 0, // Can potentially be set to an average points value
+        points: 0,
       };
 
       if (cluster.length === 0) {
-        // Handle empty clusters (consider re-initializing or merging)
         console.warn(
           "Empty cluster detected. Consider re-initializing centroids or merging clusters."
         );
@@ -100,13 +93,11 @@ class KMeans {
 
       for (const dataIndex of cluster) {
         const song = this.data[dataIndex];
-        // Update genres by accumulating occurrences (or consider averaging)
         for (const genre of song.genres) {
           if (!newCentroid.genres.includes(genre)) {
             newCentroid.genres.push(genre);
           }
         }
-        // Update points (or consider averaging)
         newCentroid.points += song.points;
       }
       newCentroids.push(newCentroid);
@@ -114,9 +105,7 @@ class KMeans {
     return newCentroids;
   }
 
-  // K-means algorithm implementation
   public cluster(): { clusters: number[][]; centroids: Song[] } {
-    // Initialize centroids randomly
     let centroids = this.data.slice(0, this.k);
     let clusters: any;
 
@@ -127,7 +116,6 @@ class KMeans {
     while (!hasConverged && iterations < this.maxIterations) {
       clusters = this.assignClusters();
 
-      // Check for convergence (minimal centroid movement)
       if (previousClusters) {
         hasConverged = clusters.every((cluster: any, index: number) =>
           cluster.every(
@@ -138,7 +126,6 @@ class KMeans {
       }
       previousClusters = clusters;
 
-      // Re-initialize centroids if empty clusters persist
       if (
         !hasConverged &&
         iterations > this.maxIterations / 2 &&

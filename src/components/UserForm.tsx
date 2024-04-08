@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { formSchema } from "./formSchema";
-import { musicalGenres } from './data/genres';
+import { formSchema } from "@/formSchema";
+import { musicalGenres } from "@/data/genres";
 
 type UserFormProps = {
   onSubmit: (data: z.infer<typeof formSchema>) => void;

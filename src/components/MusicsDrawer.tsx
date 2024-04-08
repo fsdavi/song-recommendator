@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Musics } from "./types";
+import { Musics } from "@/types";
 import {
   DrawerClose,
   DrawerContent,

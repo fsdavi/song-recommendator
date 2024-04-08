@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Musics } from "./types";
+import { Musics } from "@/types";
 
 export function MusicsCarousel({
   musics
