@@ -2,58 +2,102 @@ interface Song {
   title: string;
   artists: string[];
   genres: string[];
-  points: number;
+  listenMetrics: number;
+}
 
 class KMeans {
   private k: number;
   private maxIterations: number;
   private data: Song[];
+  private genresSelected: string[];
+  private selectedArtists: string[];
 
-  constructor(k: number, maxIterations = 100, data: Song[]) {
+  constructor(
+    k: number,
+    maxIterations = 100,
+    data: Song[],
+    genresSelected: string[],
+    selectedArtists: string[]
+  ) {
     this.k = k;
     this.maxIterations = maxIterations;
     this.data = data;
+    this.genresSelected = genresSelected;
+    this.selectedArtists = selectedArtists;
   }
 
-  private encodeGenres(genres: string[]): number[] {
-    const genreSet = new Set<string>();
-    for (const song of this.data) {
-      for (const genre of song.genres) {
-        genreSet.add(genre);
-      }
+  private getSongPoints(song: Song): number {
+    let points: number = 0;
+
+    for (const genre of song.genres) {
+      if (this.genresSelected.includes(genre.toLowerCase())) points = +2;
     }
 
-    const genreArray = Array.from(genreSet);
-
-    const oneHotEncoding: any = Array.from(genreSet).fill('0');
-
-    for (let i = 0; i < genres.length; i++) {
-      const genreIndex = genreArray.indexOf(genres[i]);
-      if (genreIndex !== -1) {
-        oneHotEncoding[genreIndex] = 1;
-      } else {
-        console.warn(`Genre "${genres[i]}" not found in dataset.`);
-      }
+    for (const artist of song.artists) {
+      this.selectedArtists.includes(artist.toLowerCase()) && points++;
     }
 
-    return oneHotEncoding;
+    return points;
   }
 
   private distance(song1: Song, song2: Song): number {
-    const encodedGenre1 = this.encodeGenres(song1.genres);
-    const encodedGenre2 = this.encodeGenres(song2.genres);
+    const song1Points = this.getSongPoints(song1);
+    const song2Points = this.getSongPoints(song2);
 
-    let sum = 0;
-    for (let i = 0; i < encodedGenre1.length; i++) {
-      const diff = encodedGenre1[i] - encodedGenre2[i];
-      sum += diff * diff;
-    }
-    return Math.sqrt(sum);
+    return Math.abs(song1Points - song2Points);
   }
 
-  // Assign each song to the nearest centroid
-  private assignClusters(): number[][] {
-    const clusters: number[][] = [];
+  private cleanClusters(clusters: Song[][]): Song[][] {
+    const cleanedClusters: Song[][] = [];
+    for (const cluster of clusters) {
+      const cleanedCluster: Song[] = [];
+      for (const song of cluster) {
+        const hasMatchingGenre = song.genres.some((genre) =>
+          this.genresSelected.includes(genre.toLowerCase())
+        );
+        const hasMatchingArtist = song.artists.some((artist) =>
+          this.selectedArtists.includes(artist.toLowerCase())
+        );
+        if (hasMatchingGenre || hasMatchingArtist) {
+          cleanedCluster.push(song);
+        }
+      }
+      cleanedClusters.push(cleanedCluster);
+    }
+    return this.separateClustersByGenres(cleanedClusters);
+  }
+
+  private separateClustersByGenres(clusters: Song[][]): Song[][] {
+    const genres = new Set();
+    const musicByGenre = [];
+
+    for (const music of clusters.flat()) {
+      // Adicionar cada gênero ao conjunto
+      for (const genre of music.genres) {
+        genres.add(genre);
+      }
+    }
+
+    const originalArrayLength = clusters.length;
+
+    for (const genre of genres) {
+      musicByGenre.push([]);
+
+      if (musicByGenre.length <= originalArrayLength) {
+        for (const music of clusters.flat()) {
+          if (music.genres.includes(genre)) {
+            musicByGenre[musicByGenre.length - 1].push(music);
+          }
+        }
+      }
+    }
+
+    return musicByGenre.filter((music) => music.length > 0);
+  }
+
+  private assignClusters(): Song[][] {
+    debugger;
+    const clusters: Song[][] = [];
     for (let i = 0; i < this.k; i++) {
       clusters.push([]);
     }
@@ -69,37 +113,36 @@ class KMeans {
           closestCentroid = centroid;
         }
       }
-      clusters[closestCentroid].push(this.data.indexOf(song));
+      clusters[closestCentroid].push(song);
     }
-    return clusters;
+    return this.cleanClusters(clusters);
   }
 
-  private updateCentroids(clusters: number[][]): Song[] {
+  private updateCentroids(clusters: Song[][]): Song[] {
     const newCentroids: Song[] = [];
     for (const cluster of clusters) {
-      const newCentroid: Song = {
+      let newCentroid: Song = {
         title: "",
         artists: [],
         genres: [],
-        points: 0,
+        listenMetrics: 0,
       };
 
       if (cluster.length === 0) {
-        console.warn(
-          "Empty cluster detected. Consider re-initializing centroids or merging clusters."
-        );
         continue;
       }
 
-      for (const dataIndex of cluster) {
-        const song = this.data[dataIndex];
-        for (const genre of song.genres) {
-          if (!newCentroid.genres.includes(genre)) {
-            newCentroid.genres.push(genre);
-          }
+      for (const song of cluster) {
+        if(!newCentroid.title) newCentroid = song;
+        else {
+          const newCentroidPoints = this.getSongPoints(newCentroid);
+          const songPoints = this.getSongPoints(song);
+
+          if(newCentroidPoints < songPoints) newCentroid = song;
+          if(newCentroidPoints === songPoints && newCentroid.listenMetrics < song.listenMetrics) newCentroid = song;
         }
-        newCentroid.points += song.points;
       }
+
       newCentroids.push(newCentroid);
     }
     return newCentroids;
@@ -146,46 +189,18 @@ class KMeans {
   }
 }
 
-export const kmeans = (clustersNumbers: number) => {
-  const data: Song[] = [
-    {
-      title: "Song",
-      artists: ["Artist"],
-      genres: ["Metal"],
-      points: 0,
-    },
-    {
-      title: "Song 2",
-      artists: ["Artist"],
-      genres: ["Pop"],
-      points: 0,
-    },
-    {
-      title: "Song 3",
-      artists: ["Artist"],
-      genres: ["Rock"],
-      points: 0,
-    },
-    {
-      title: "Song 4",
-      artists: ["Artist"],
-      genres: ["Rock"],
-      points: 0,
-    },
-    {
-      title: "Song 5",
-      artists: ["Artist"],
-      genres: ["Pop"],
-      points: 0,
-    },
-    {
-      title: "Song 6",
-      artists: ["Artist"],
-      genres: ["Pop"],
-      points: 0,
-    }
-  ];
-
-  const kmeans = new KMeans(clustersNumbers, 100, data);
+export const kmeans = (
+  songs: Song[],
+  genresSelected: string[],
+  selectedArtists: string[]
+) => {
+  console.log("genres", genresSelected);
+  const kmeans = new KMeans(
+    genresSelected.length,
+    100,
+    songs,
+    genresSelected,
+    selectedArtists
+  );
   return kmeans.cluster();
-}
+};

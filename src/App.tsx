@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import UserForm from "@/components/UserForm";
 import { z } from "zod";
 import { formSchema } from "./formSchema";
 import MusicsDrawer from "@/components/MusicsDrawer";
-import { Musics } from "./types";
+import { Song } from "./types";
+import { musicsDataset } from "@/data/musics";
 import {
   Drawer
 } from "@/components/ui/drawer"
@@ -11,40 +12,18 @@ import {
 import { kmeans } from './kmeans/index'
 
 function App() {
-  const [recommendedMusics, setRecommendedMusics] = useState<Musics[]>();
+  const [recommendedMusics, setRecommendedMusics] = useState<Song[]>();
   const [userName, setUserName] = useState<string>("");
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     setUserName(data.username)
-    setRecommendedMusics([
-      {
-        title: "Song",
-        artists: ["Artist"],
-        genres: ["Metal"],
-        points: undefined,
-      },
-      {
-        title: "Song 2",
-        artists: ["Artist"],
-        genres: ["Pop"],
-        points: undefined,
-      },
-      {
-        title: "Song 3",
-        artists: ["Artist"],
-        genres: ["Rock"],
-        points: undefined,
-      },
-    ]);
+    const artists = data.artists.split(",").map((artist) => artist.trim().toLowerCase());
+    const { clusters, centroids } = kmeans(musicsDataset, data.musicalGenres, artists);
+    console.log(clusters, centroids)
+    setRecommendedMusics(centroids)
     setDrawerOpen(true)
   };
-
-  useEffect(() => {
-    const { clusters, centroids } = kmeans(3);
-
-    console.log(clusters, centroids)
-  }, []);
 
   return (
     <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>

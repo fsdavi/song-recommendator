@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Musics } from "@/types";
+import { Song } from "@/types";
 import {
   DrawerClose,
   DrawerContent,
@@ -14,7 +14,7 @@ export default function MusicsDrawer({
   musics,
   userName,
 }: {
-  musics: Musics[] | undefined;
+  musics: Song[] | undefined;
   userName: string | undefined;
 }) {
   return (
