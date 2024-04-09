@@ -11,10 +11,10 @@ import {
 import { MusicsCarousel } from "./MusicsCarousel";
 
 export default function MusicsDrawer({
-  musics,
+  songs,
   userName,
 }: {
-  musics: Song[] | undefined;
+  songs: Song[] | undefined;
   userName: string | undefined;
 }) {
   return (
@@ -27,7 +27,7 @@ export default function MusicsDrawer({
           </DrawerDescription>
         </DrawerHeader>
         <div className="p-4 pb-0">
-          <MusicsCarousel musics={musics} />
+          <MusicsCarousel songs={songs} />
         </div>
         <DrawerFooter>
           <DrawerClose asChild>

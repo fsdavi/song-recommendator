@@ -1,4 +1,4 @@
-export const musicsDataset = [
+export const songsDataset = [
   {
     title: "Bohemian Rhapsody",
     artists: ["Queen"],

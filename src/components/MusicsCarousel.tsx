@@ -6,24 +6,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Musics } from "@/types";
+import { Song } from "@/types";
 
 export function MusicsCarousel({
-  musics
+  songs
 }: {
-  musics: Musics[] | undefined;
+  songs: Song[] | undefined;
 }) {
   return (
     <Carousel className="w-full max-w-xs">
       <CarouselContent>
-        {musics?.length &&
-          musics.map((music) => (
-            <CarouselItem key={music.title}>
+        {songs?.length &&
+          songs.map((song) => (
+            <CarouselItem key={song.title}>
               <div className="p-1">
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center p-6">
                     <span className="text-4xl font-semibold">
-                      {music.title}
+                      {song.title}
                     </span>
                   </CardContent>
                 </Card>

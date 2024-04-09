@@ -4,11 +4,10 @@ import { z } from "zod";
 import { formSchema } from "./formSchema";
 import MusicsDrawer from "@/components/MusicsDrawer";
 import { Song } from "./types";
-import { musicsDataset } from "@/data/musics";
+import { songsDataset } from "@/data/musics";
 import {
   Drawer
 } from "@/components/ui/drawer"
-
 import { kmeans } from './kmeans/index'
 
 function App() {
@@ -19,7 +18,7 @@ function App() {
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     setUserName(data.username)
     const artists = data.artists.split(",").map((artist) => artist.trim().toLowerCase());
-    const { clusters, centroids } = kmeans(musicsDataset, data.musicalGenres, artists);
+    const { clusters, centroids } = kmeans(songsDataset, data.musicalGenres, artists);
     console.log(clusters, centroids)
     setRecommendedMusics(centroids)
     setDrawerOpen(true)
