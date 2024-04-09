@@ -3,7 +3,6 @@ export type Song = {
   artists: string[]
   genres: string[]
   listenMetrics: number
-  points: number | undefined
 }
 
 export type Genre = {
