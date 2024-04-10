@@ -4,6 +4,9 @@ export function kmeans(vector, k, callback) {
   return new Kmeans(vector, k, callback);
 }
 
+// Algoritmo feito para apresentação em sala de aula disponível também em:
+// https://replit.com/@DaviFreire/Kmeans
+
 function Kmeans(vector, k, callback) {
   this.callback = callback;
   this.vector = vector;
