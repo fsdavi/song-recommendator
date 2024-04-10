@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { formSchema } from './formSchema';
 import MusicsDrawer from '@/components/MusicsDrawer';
 import { Song } from './types';
-import { songsDataset } from '@/data/musics';
 import { Drawer } from '@/components/ui/drawer';
-import { kmeans } from './kmeans/index';
+import { kmeans } from './kmeans/kmeans';
+import { getSongNearestToCentroid, getSongsAsVector } from './utils';
 import Recommend from './components/Reccomend';
 import calculateSongProbability from './bayes';
 import { songHistory } from './bayes/songHistory';
@@ -18,16 +18,27 @@ function App() {
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     setUserName(data.username);
+
     const artists = data.artists
       .split(',')
       .map(artist => artist.trim().toLowerCase());
-    const { clusters, centroids } = kmeans(
-      songsDataset,
-      data.musicalGenres,
-      artists
-    );
-    console.log(clusters, centroids);
-    setRecommendedMusics(centroids);
+    const genresSelected = data.musicalGenres;
+
+    const songsAsVectors = getSongsAsVector(genresSelected, artists);
+
+    kmeans(songsAsVectors, 3, (clusters: number[][], centroids: number[][]) => {
+      console.log('clusters: ', clusters);
+      console.log('centroids: ', centroids);
+
+      setRecommendedMusics(
+        centroids
+          .map((centroid: number[]) =>
+            getSongNearestToCentroid(centroid, songsAsVectors)
+          )
+          .reverse()
+      );
+    });
+
     setDrawerOpen(true);
   };
 
