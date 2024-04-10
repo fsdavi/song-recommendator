@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import UserForm from '@/components/UserForm';
-import { z } from 'zod';
-import { formSchema } from './formSchema';
-import MusicsDrawer from '@/components/MusicsDrawer';
-import { Song } from './types';
-import { Drawer } from '@/components/ui/drawer';
-import { kmeans } from './kmeans/kmeans';
-import { getSongNearestToCentroid, getSongsAsVector } from './utils';
 import Recommend from './components/Reccomend';
 import calculateSongProbability from './bayes';
 import { songHistory } from './bayes/songHistory';
+import UserForm from "@/components/UserForm";
+import { z } from "zod";
+import { formSchema } from "./formSchema";
+import MusicsDrawer from "@/components/MusicsDrawer";
+import { Song } from "./types";
+import { Drawer } from "@/components/ui/drawer";
+import { kmeans } from "./kmeans/kmeans";
+import { getSongNearestToCentroid, getSongsAsVector } from "./utils";
 
 function App() {
   const [recommendedMusics, setRecommendedMusics] = useState<Song[]>();
-  const [userName, setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>("");
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
