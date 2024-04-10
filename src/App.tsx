@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import Recommend from './components/Reccomend';
+import UserForm from '@/components/UserForm';
+import { z } from 'zod';
+import { formSchema } from './formSchema';
+import MusicsDrawer from '@/components/MusicsDrawer';
+import { Song } from './types';
+import { Drawer } from '@/components/ui/drawer';
+import { kmeans } from './kmeans/kmeans';
+import { getSongNearestToCentroid, getSongsAsVector } from './utils';
 import calculateSongProbability from './bayes';
 import { songHistory } from './bayes/songHistory';
-import UserForm from "@/components/UserForm";
-import { z } from "zod";
-import { formSchema } from "./formSchema";
-import MusicsDrawer from "@/components/MusicsDrawer";
-import { Song } from "./types";
-import { Drawer } from "@/components/ui/drawer";
-import { kmeans } from "./kmeans/kmeans";
-import { getSongNearestToCentroid, getSongsAsVector } from "./utils";
 
 function App() {
-  const [recommendedMusics, setRecommendedMusics] = useState<Song[]>();
-  const [userName, setUserName] = useState<string>("");
+  const [recommendedSongs, setRecommendedSongs] = useState<Song[]>();
+  const [userName, setUserName] = useState<string>('');
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
@@ -30,7 +29,7 @@ function App() {
       console.log('clusters: ', clusters);
       console.log('centroids: ', centroids);
 
-      setRecommendedMusics(
+      setRecommendedSongs(
         centroids
           .map((centroid: number[]) =>
             getSongNearestToCentroid(centroid, songsAsVectors)
@@ -42,20 +41,19 @@ function App() {
     setDrawerOpen(true);
   };
 
-  const newSongs = () => {
+  const handleRecommendedSongsByProbability = () => {
     const recomendacoes = calculateSongProbability(songHistory); // Calcula as recomendações
-    setRecommendedMusics(recomendacoes);
-    setDrawerOpen(true);
+    setRecommendedSongs(recomendacoes);
   };
 
   return (
     <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-      <div className="container flex flex-col justify-center align-center h-screen">
-        <Recommend onClick={newSongs} />
+
+      <div className="container flex flex-col justify-center align-center h-screen p-10">
         <UserForm
           onSubmit={(data: z.infer<typeof formSchema>) => handleSubmit(data)}
         />
-        <MusicsDrawer songs={recommendedMusics} userName={userName} />
+        <MusicsDrawer songs={recommendedSongs} userName={userName} handleRecommendedSongs={handleRecommendedSongsByProbability}/>
       </div>
     </Drawer>
   );

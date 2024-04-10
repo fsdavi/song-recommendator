@@ -6,14 +6,9 @@ interface RecommendProps {
 
 export default function Recommend({ onClick }: RecommendProps) {
   return (
-    <div className="space-y-8 container flex justify-center items-center h-full flex-col">
-      <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-        Já possui um histórico? Clique no botão abaixo para receber
-        recomendações
-      </h4>
-
+    <div className="space-y-8 container flex justify-center items-center h-full flex-col w-full">
       <Button type="button" onClick={onClick}>
-        Recomendações
+        Gerar recomendações com base no histórico
       </Button>
     </div>
   );

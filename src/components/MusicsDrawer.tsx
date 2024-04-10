@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Song } from '@/types';
+import { Button } from "@/components/ui/button";
+import { Song } from "@/types";
 import {
   DrawerClose,
   DrawerContent,
@@ -7,15 +7,18 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from '@/components/ui/drawer';
-import { MusicsCarousel } from './MusicsCarousel';
+} from "@/components/ui/drawer";
+import { MusicsCarousel } from "./MusicsCarousel";
+import Recommend from "@/components/Reccomend";
 
 export default function MusicsDrawer({
   songs,
   userName,
+  handleRecommendedSongs,
 }: {
   songs: Song[] | undefined;
   userName?: string | undefined;
+  handleRecommendedSongs: () => void;
 }) {
   return (
     <DrawerContent>
@@ -31,8 +34,9 @@ export default function MusicsDrawer({
         <div className="p-4 pb-0">
           <MusicsCarousel songs={songs} />
         </div>
-        <DrawerFooter>
-          <DrawerClose asChild>
+        <DrawerFooter className="flex items-center">
+          <Recommend onClick={handleRecommendedSongs} />
+          <DrawerClose asChild className="w-20">
             <Button variant="outline">Fechar</Button>
           </DrawerClose>
         </DrawerFooter>

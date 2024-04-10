@@ -5,6 +5,7 @@ interface Song {
   artists: string[];
   genres: string[];
   listenMetrics: number;
+  link: string;
 }
 
 export default function calculateSongProbability(songHistory: Song[]): Song[] {

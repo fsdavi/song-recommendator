@@ -19,16 +19,16 @@ export function MusicsCarousel({ songs }: { songs: Song[] | undefined }) {
               <div className="p-1">
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center p-6 flex-col gap-4">
-                    <span className="text-4xl font-semibold">{song.title}</span>
+                    <span className="text-3xl font-semibold">{song.title}</span>
                     <span className="text-lg font-semibold">
                       {song.artists.join(", ")}
                     </span>
                     <span className="text-lg font-semibold">
                       {song.genres.join(", ")}
                     </span>
-                    <button className="text-white bg-accent hover:bg-primary/90 rounded-full p-2">
+                    <a className="text-white bg-accent hover:bg-primary/90 rounded-full p-2" href={song.link} target="_blank">
                       <FaCirclePlay />
-                    </button>
+                    </a>
                   </CardContent>
                 </Card>
               </div>
