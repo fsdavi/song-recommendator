@@ -31,7 +31,7 @@ function App() {
           onSubmit={(data: z.infer<typeof formSchema>) => handleSubmit(data)}
         />
 
-        <MusicsDrawer musics={recommendedMusics} userName={userName}/>
+        <MusicsDrawer songs={recommendedMusics} userName={userName}/>
       </div>
     </Drawer>
   );
