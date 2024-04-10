@@ -8,54 +8,40 @@ interface Song {
 }
 
 export default function calculateSongProbability(songHistory: Song[]): Song[] {
-  // filtrar as músicas que o usuário ainda não ouviu
   const unlistenedSongs = songsDataset.filter(
     song => !songHistory.some(s => s.title === song.title)
   );
-
-  // calcular a probabilidade 0-1 de cada música não ouvida
   const songProbabilities = unlistenedSongs.map(song => {
-    // probabilidade inicial (prior) de uma música ser de interesse para o usuário
-    const priorProbability = 1 / songHistory.length;
+    let probability = 0;
 
-    // probabilidade do gênero da música dado que a música é de interesse para o usuário
-    const genreCounts = songHistory.reduce((acc, curr) => {
-      curr.genres.forEach(genre => {
-        acc[genre] = (acc[genre] || 0) + 1;
-      });
-      return acc;
-    }, {} as Record<string, number>);
-    const genreProbabilities = Object.fromEntries(
-      Object.entries(genreCounts).map(([genre, count]) => [
-        genre,
-        count / songHistory.length,
-      ])
-    );
-    const likelihood = song.genres.reduce(
-      (acc, genre) => acc * (genreProbabilities[genre] || 0),
-      1
-    );
-    // probabilidade do gênero da música (evidência)
-    const evidence = Object.values(genreProbabilities).reduce(
-      (acc, prob) => acc + prob,
-      0
-    );
+    // verificar se o artista está no songHistory
+    if (
+      songHistory.some(s =>
+        s.artists.some(artist => song.artists.includes(artist))
+      )
+    ) {
+      probability += 1000;
+    }
 
-    // teorema de Bayes
-    const finalProbability = (priorProbability * likelihood) / evidence;
+    // agora com genero
+    song.genres.forEach(genre => {
+      if (songHistory.some(s => s.genres.includes(genre))) {
+        probability += 400;
+      }
+    });
+
+    // diferencial do listenMetrics
+    probability += song.listenMetrics / 10;
 
     return {
       ...song,
-      probability: finalProbability,
+      probability,
     };
   });
 
-  // exclui musicas com probabilidade 0
-  const filteredSongs = songProbabilities.filter(song => song.probability > 0);
-
   // ordenar as músicas por probabilidade
-  filteredSongs.sort((a, b) => b.probability - a.probability);
-
-  // retornar as músicas ordenadas
-  return filteredSongs;
+  songProbabilities.sort((a, b) => b.probability - a.probability);
+  return songProbabilities.slice(0, 10);
 }
+
+// console.log(JSON.stringify(songProbabilities));
